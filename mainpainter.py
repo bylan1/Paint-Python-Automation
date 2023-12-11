@@ -1,12 +1,15 @@
 import pyautogui
 import keyboard
 import random
+from scipy.spatial import ConvexHull
 
 # size of 1900 x 860 MS Paint canvas (minus 5)
 xmin = 10
 xmax = 1894
 ymin = 149
 ymax = 993
+
+coords = []
 
 # drags a circle of radius 5 around cursor point
 def circle_draw():
@@ -44,16 +47,23 @@ def cursor_position():
     x, y = pyautogui.position()
     print(f"Current Cursor Position - X: {x}, Y: {y}")
 
+# convex hull solution
+def compute_conv_hull(a):
+    points = [(x,y) for x, y in a]
+    ret = ConvexHull(points)
+    return [points[vertex] for vertex in ret.vertices]
+
 # draws line connecting points in the drawing order
 def connect_points():
-    length = len(coords)
+    edge_points = compute_conv_hull(coords)
+    edge_points.append(edge_points[0])      # adds last point to loop convex hull
+    length = len(edge_points)
+
     for i in range(length):
         if i == 0:
-            pyautogui.moveTo(coords[i][0], coords[i][1])
+            pyautogui.moveTo(edge_points[i][0], edge_points[i][1])
         else:
-            pyautogui.dragTo(coords[i][0], coords[i][1], duration=1, button="left")
-
-coords = []
+            pyautogui.dragTo(edge_points[i][0], edge_points[i][1], duration=1, button="left")
 
 while True:
     try:
@@ -70,5 +80,6 @@ while True:
         if input == "-":
             coords.sort()       # sorts based on x-coord and then y-coord
             connect_points()
+            break
     except:
         break

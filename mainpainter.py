@@ -4,6 +4,13 @@ import random
 from scipy.spatial import ConvexHull
 import sys
 
+# this program operates in a 1900 x 860 MS Paint canvas and visualises the convex hull problem with drawn nodes and edges given a number of randomly placed nodes
+# (ctrl + 1): creates 10 random nodes and draws the convex hull edges
+# (0-9): draws given number of random nodes on canvas
+# (-): draws the edges of the convex hull problem nodes including all previously drawn nodes
+# (z): outputs the coordinates of the cursor in terminal
+# (esc): stops the program from running after completing its given task 
+
 # size of 1900 x 860 MS Paint canvas (minus 5)
 xmin = 10
 xmax = 1894
@@ -11,6 +18,8 @@ ymin = 149
 ymax = 993
 
 coords = []
+
+running = True
 
 # drags a circle of radius 5 around cursor point
 def circle_draw():
@@ -69,25 +78,36 @@ def connect_points():
         else:
             pyautogui.dragTo(edge_points[i][0], edge_points[i][1], duration=1, button="left")
 
-def test(e):
+
+def exit_program(e):
+    global running
     if e.name == "esc":
         print("Successful termination")
-        # terminate script
+        running = False
 
-keyboard.hook(test)
+keyboard.hook(exit_program)
 
-while True:
+while running:
     try:
         input = keyboard.read_key()
-        if keyboard.is_pressed("ctrl+1"):
+        if keyboard.is_pressed("-"):
+            coords.sort()       # sorts based on x-coord and then y-coord
+            connect_points()
+        elif keyboard.is_pressed("z"):
+            cursor_position()
+        elif keyboard.is_pressed("ctrl+1"):
+            num = 10
+            while num > 0 and running:
+                coords.append(random_cursor())
+                cursor_position()
+                circle_draw()
+                num -= 1
             coords.sort()       # sorts based on x-coord and then y-coord
             connect_points()
             break
-        elif keyboard.is_pressed("z"):
-            cursor_position()
         elif input.isnumeric():
             num = int(input)
-            while num > 0:
+            while num > 0 and running:
                 coords.append(random_cursor())
                 cursor_position()
                 circle_draw()

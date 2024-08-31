@@ -85,7 +85,7 @@ def compute(a, problem):
 
 # draws line connecting points in the drawing order
 def connect_points(coords, problem):
-    print(coords)
+    # print(coords)
     if len(coords) > 2:
         edge_points = compute(coords, problem)
         edge_points.append(edge_points[0])      # adds last point to loop convex hull
@@ -94,7 +94,7 @@ def connect_points(coords, problem):
     
     length = len(edge_points)
 
-    print(edge_points)
+    # print(edge_points)
 
     edges = set([])
 

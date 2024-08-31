@@ -13,7 +13,8 @@ from algorithm import *
 
 running = True
 
-coords = [[52, 269], [601, 695], [1305, 903], [1504, 177], [1859, 779]]
+# coords = [[52, 269], [601, 695], [1305, 903], [1504, 177], [1859, 779]]
+coords = []
 
 def exit_program(e):
     global running

@@ -108,7 +108,7 @@ def connect_points(coords, problem):
             current_edge = (edge_points[i-1], edge_points[i])
             reverse_edge = (edge_points[i], edge_points[i-1])
 
-            if current_edge in edges or reverse_edge in edges or i % 2 == 0:
+            if problem == "delaunay" and (current_edge in edges or reverse_edge in edges or i % 2 == 0):
                 pyautogui.moveTo(edge_points[i][0], edge_points[i][1])
             else:
                 pyautogui.dragTo(edge_points[i][0], edge_points[i][1], duration=0.1, button="left")

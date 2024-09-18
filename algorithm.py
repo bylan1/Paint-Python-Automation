@@ -47,39 +47,61 @@ def cursor_position():
     x, y = pyautogui.position()
     print(f"Current Cursor Position - X: {x}, Y: {y}")
 
-def simplice_to_edge(simplices):
+def convert_edge(simplices):
     edges = []
     for tri in simplices:
-        for k in range(3):
-            i, j = tri[k], tri[(k+1)%3]
+        print(tri)
+        for k in range(len(tri)):
+            i, j = tri[k], tri[(k+1)%len(tri)]
             i, j = min(i,j), max(i, j)
             edges.append((i,j))
-    
+    print(edges)
     return edges
 
 # convex hull solution
-def compute(a, problem):
+def compute(inputs, problem):
     print("Computing...")
-    points = [(x,y) for x, y in a]
+    points = [(x,y) for x, y in inputs]
 
     if problem == "delaunay":
         ret = Delaunay(points)
-        edges = simplice_to_edge(ret.simplices)
+        print(ret.simplices)
+        edges = convert_edge(ret.simplices)
         unique_points = []
         for (a, b) in edges:
             unique_points.append(a)
             unique_points.append(b)
+
+        print(unique_points)
         return [points[idx] for idx in unique_points]
     
     elif problem == "convex_hull":
         ret = ConvexHull(points)
+        print(ret.vertices)
         return [points[vertex] for vertex in ret.vertices]
     
     # incomplete voronoi method
     elif problem == "voronoi":
         ret = Voronoi(points)
-
-        return [points[vertex] for vertex in ret.vertices]
+        print("ret made: ", ret.vertices)
+        edges = ret.vertices
+        points = []
+        for [a, b] in edges:
+            if a > X_MAX:
+                a = X_MAX
+            elif a < X_MIN:
+                a = X_MIN
+            
+            if b > Y_MAX:
+                b = Y_MAX
+            elif b < Y_MIN:
+                b = Y_MIN
+            points.append((abs(a), abs(b)))
+        
+        return points
+    
+    else:
+        print("Error: not existing problem, use delaunay, convex_hull, or voronoi")
     
     return None
 
@@ -88,16 +110,19 @@ def connect_points(coords, problem):
     # print(coords)
     if len(coords) > 2:
         edge_points = compute(coords, problem)
-        edge_points.append(edge_points[0])      # adds last point to loop convex hull
+        print("finished compute")
+        edge_points.append(edge_points[0])      # adds last point to loop
     else:
         edge_points = coords
+
+    print("abs coords: ", edge_points)
     
     length = len(edge_points)
 
-    # print(edge_points)
+    print(edge_points)
 
+    # if problem != 'voronoi':
     edges = set([])
-
     for i in range(length):
         if i == 0:
             pyautogui.moveTo(edge_points[i][0], edge_points[i][1])
@@ -114,4 +139,13 @@ def connect_points(coords, problem):
                 pyautogui.dragTo(edge_points[i][0], edge_points[i][1], duration=0.1, button="left")
                 edges.add(current_edge)
                 edges.add(reverse_edge)
+
+    # else:
+    #     for i in range(length):
+    #         if i == 0:
+    #             pyautogui.moveTo(edge_points[i][0], edge_points[i][1])
+    #         else:
+    #             pyautogui.moveTo(edge_points[i][0], edge_points[i][1])
+
+
 
